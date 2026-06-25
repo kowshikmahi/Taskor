@@ -11,15 +11,27 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          <a href="#features" className="text-sm font-medium text-taskor-slate hover:text-taskor-ink">
+          <a
+            href="#features"
+            className="text-sm font-medium text-taskor-slate hover:text-taskor-ink"
+          >
             Features
           </a>
-          <a href="#workflow" className="text-sm font-medium text-taskor-slate hover:text-taskor-ink">
+
+          <a
+            href="#workflow"
+            className="text-sm font-medium text-taskor-slate hover:text-taskor-ink"
+          >
             Workflow
           </a>
-          <a href="#dashboard" className="text-sm font-medium text-taskor-slate hover:text-taskor-ink">
+
+          {/* THIS is the important fix */}
+          <Link
+            to="/app"
+            className="text-sm font-medium text-taskor-slate hover:text-taskor-ink"
+          >
             Dashboard
-          </a>
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -29,6 +41,7 @@ export default function Navbar() {
           >
             Login
           </Link>
+
           <Link
             to="/signup"
             className="rounded-btn bg-taskor-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-card transition hover:scale-[1.02]"
