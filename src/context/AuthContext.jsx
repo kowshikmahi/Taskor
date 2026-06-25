@@ -1,40 +1,58 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { getCurrentUser, loginUser, signupUser } from "../services/authService";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("taskor_user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    async function bootstrapAuth() {
+      const token = localStorage.getItem("taskor_token");
+
+      if (!token) {
+        setAuthLoading(false);
+        return;
+      }
+
+      try {
+        const data = await getCurrentUser();
+        setUser(data.user);
+      } catch (error) {
+        localStorage.removeItem("taskor_token");
+        localStorage.removeItem("taskor_user");
+        setUser(null);
+      } finally {
+        setAuthLoading(false);
+      }
     }
+
+    bootstrapAuth();
   }, []);
 
-  function login(email) {
-    const fakeUser = {
-      id: Date.now(),
-      name: email.split("@")[0],
-      email,
-    };
+  async function signup(name, email, password) {
+    const data = await signupUser({ name, email, password });
 
-    localStorage.setItem("taskor_user", JSON.stringify(fakeUser));
-    setUser(fakeUser);
+    localStorage.setItem("taskor_token", data.token);
+    localStorage.setItem("taskor_user", JSON.stringify(data.user));
+    setUser(data.user);
+
+    return data.user;
   }
 
-  function signup(name, email) {
-    const fakeUser = {
-      id: Date.now(),
-      name,
-      email,
-    };
+  async function login(email, password) {
+    const data = await loginUser({ email, password });
 
-    localStorage.setItem("taskor_user", JSON.stringify(fakeUser));
-    setUser(fakeUser);
+    localStorage.setItem("taskor_token", data.token);
+    localStorage.setItem("taskor_user", JSON.stringify(data.user));
+    setUser(data.user);
+
+    return data.user;
   }
 
   function logout() {
+    localStorage.removeItem("taskor_token");
     localStorage.removeItem("taskor_user");
     setUser(null);
   }
@@ -43,11 +61,12 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       isAuthenticated: !!user,
-      login,
+      authLoading,
       signup,
+      login,
       logout,
     }),
-    [user]
+    [user, authLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -55,8 +74,10 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuth must be used inside AuthProvider");
   }
+
   return context;
 }

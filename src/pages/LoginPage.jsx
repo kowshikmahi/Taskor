@@ -15,18 +15,32 @@ export default function LoginPage() {
     password: "",
   });
 
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
 
-    if (!form.email || !form.password) return;
+    if (!form.email || !form.password) {
+      setError("Please enter your email and password.");
+      return;
+    }
 
-    login(form.email);
-    navigate(from, { replace: true });
+    try {
+      setSubmitting(true);
+      await login(form.email, form.password);
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -64,9 +78,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                  Email
-                </label>
+                <label className="mb-2 block text-sm font-semibold text-taskor-ink">Email</label>
                 <input
                   type="email"
                   name="email"
@@ -78,9 +90,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                  Password
-                </label>
+                <label className="mb-2 block text-sm font-semibold text-taskor-ink">Password</label>
                 <input
                   type="password"
                   name="password"
@@ -91,11 +101,18 @@ export default function LoginPage() {
                 />
               </div>
 
+              {error ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {error}
+                </div>
+              ) : null}
+
               <button
                 type="submit"
-                className="w-full rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white shadow-card transition hover:scale-[1.01]"
+                disabled={submitting}
+                className="w-full rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white shadow-card transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Log In
+                {submitting ? "Logging in..." : "Log In"}
               </button>
             </form>
 

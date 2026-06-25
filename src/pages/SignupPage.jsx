@@ -13,18 +13,32 @@ export default function SignupPage() {
     password: "",
   });
 
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
 
-    if (!form.name || !form.email || !form.password) return;
+    if (!form.name || !form.email || !form.password) {
+      setError("Please fill in all fields.");
+      return;
+    }
 
-    signup(form.name, form.email);
-    navigate("/app", { replace: true });
+    try {
+      setSubmitting(true);
+      await signup(form.name, form.email, form.password);
+      navigate("/app", { replace: true });
+    } catch (err) {
+      setError(err.message || "Signup failed");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -62,9 +76,7 @@ export default function SignupPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                  Full Name
-                </label>
+                <label className="mb-2 block text-sm font-semibold text-taskor-ink">Full Name</label>
                 <input
                   type="text"
                   name="name"
@@ -76,9 +88,7 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                  Email
-                </label>
+                <label className="mb-2 block text-sm font-semibold text-taskor-ink">Email</label>
                 <input
                   type="email"
                   name="email"
@@ -90,9 +100,7 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                  Password
-                </label>
+                <label className="mb-2 block text-sm font-semibold text-taskor-ink">Password</label>
                 <input
                   type="password"
                   name="password"
@@ -103,11 +111,18 @@ export default function SignupPage() {
                 />
               </div>
 
+              {error ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {error}
+                </div>
+              ) : null}
+
               <button
                 type="submit"
-                className="w-full rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white shadow-card transition hover:scale-[1.01]"
+                disabled={submitting}
+                className="w-full rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white shadow-card transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Create Account
+                {submitting ? "Creating account..." : "Create Account"}
               </button>
             </form>
 

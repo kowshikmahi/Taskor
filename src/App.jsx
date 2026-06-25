@@ -1,9 +1,9 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
+import DashboardLayout from "./components/dashboard/DashboardLayout";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import DashboardLayout from "./components/dashboard/DashboardLayout";
 import DashboardHome from "./pages/DashboardHome";
 import ClientsPage from "./pages/ClientsPage";
 import ProjectsPage from "./pages/ProjectsPage";
@@ -13,12 +13,10 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 export default function App() {
   return (
     <Routes>
-      {/* public */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
-      {/* protected app shell */}
       <Route element={<ProtectedRoute />}>
         <Route path="/app" element={<DashboardLayout />}>
           <Route index element={<DashboardHome />} />
@@ -28,7 +26,6 @@ export default function App() {
         </Route>
       </Route>
 
-      {/* fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
