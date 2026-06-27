@@ -1,43 +1,48 @@
+import { Search } from "lucide-react";
 import React from "react";
 
-export default function ClientFilters({
-  search,
-  setSearch,
-  status,
-  setStatus,
-}) {
+export default function ClientFilters() {
   return (
-    <section className="rounded-3xl border border-taskor-mist bg-white p-5 shadow-card">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="w-full lg:max-w-xl">
-          <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-            Search clients
-          </label>
-          <input
-            type="text"
-            placeholder="Search by client, contact person, or email"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-btn border border-taskor-mist bg-white px-4 py-3 text-taskor-ink outline-none transition focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10"
+    <div className="glass rounded-[28px] p-6 shadow-card">
+
+      <div className="grid md:grid-cols-3 gap-5">
+
+        <div className="relative">
+
+          <Search
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
           />
+
+          <input
+            placeholder="Search client..."
+            className="w-full h-12 rounded-2xl border border-slate-200 pl-11 pr-4 outline-none focus:border-taskor-purple"
+          />
+
         </div>
 
-        <div className="w-full lg:max-w-xs">
-          <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-            Filter by status
-          </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="w-full rounded-btn border border-taskor-mist bg-white px-4 py-3 text-taskor-ink outline-none transition focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10"
-          >
-            <option value="All">All</option>
-            <option value="Active">Active</option>
-            <option value="Lead">Lead</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
+        <select className="h-12 rounded-2xl border border-slate-200 px-4">
+
+          <option>All Clients</option>
+
+          <option>Active</option>
+
+          <option>Inactive</option>
+
+        </select>
+
+        <select className="h-12 rounded-2xl border border-slate-200 px-4">
+
+          <option>Newest</option>
+
+          <option>Oldest</option>
+
+          <option>A-Z</option>
+
+        </select>
+
       </div>
-    </section>
+
+    </div>
   );
 }

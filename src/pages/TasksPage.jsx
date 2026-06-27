@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { ArrowRight, Pencil, Plus, Trash2, X } from "lucide-react";
 import { getProjects } from "../services/projectsService";
 import { createTask, deleteTask, getTasks, updateTask } from "../services/tasksService";
 
@@ -143,8 +144,8 @@ export default function TasksPage() {
   }, [tasks]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 rounded-3xl bg-white p-6 shadow-card md:flex-row md:items-center md:justify-between">
+    <div className="space-y-5 sm:space-y-6">
+      <div className="flex flex-col gap-4 glass rounded-3xl p-5 shadow-card sm:p-6 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-taskor-purple">
             Task board
@@ -157,9 +158,10 @@ export default function TasksPage() {
 
         <button
           onClick={() => openCreateModal("Todo")}
-          className="rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white shadow-card"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white shadow-card sm:w-auto"
         >
-          + Add Task
+          <Plus size={18} />
+          <span>Add Task</span>
         </button>
       </div>
 
@@ -170,13 +172,13 @@ export default function TasksPage() {
       ) : null}
 
       {loading ? (
-        <div className="rounded-3xl bg-white p-6 shadow-card">
+        <div className="glass rounded-3xl p-5 shadow-card sm:p-6">
           <p className="text-sm text-taskor-slate">Loading tasks...</p>
         </div>
       ) : (
-        <div className="grid gap-5 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
           {columns.map((column) => (
-            <div key={column} className="rounded-3xl bg-white p-5 shadow-card">
+            <div key={column} className="glass rounded-3xl p-4 shadow-card sm:p-5">
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-taskor-ink">{column}</h2>
@@ -184,17 +186,18 @@ export default function TasksPage() {
                 </div>
                 <button
                   onClick={() => openCreateModal(column)}
-                  className="rounded-btn border border-taskor-mist px-3 py-2 text-xs font-semibold text-taskor-ink"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-btn border border-taskor-mist px-3 py-2 text-xs font-semibold text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple"
                 >
-                  + Add
+                  <Plus size={14} />
+                  <span>Add</span>
                 </button>
               </div>
 
               <div className="space-y-4">
                 {groupedTasks[column]?.length ? (
                   groupedTasks[column].map((task) => (
-                    <div key={task._id} className="rounded-3xl border border-taskor-cloud p-4">
-                      <div className="flex items-start justify-between gap-3">
+                    <div key={task._id} className="rounded-3xl border border-white/55 bg-white/45 p-4 backdrop-blur dark:bg-white/10">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <h3 className="font-bold text-taskor-ink">{task.title}</h3>
                           <p className="mt-1 text-xs font-medium text-taskor-purple">
@@ -210,7 +213,7 @@ export default function TasksPage() {
                         {task.description || "No description added."}
                       </p>
 
-                      <div className="mt-4 flex items-center justify-between text-xs text-taskor-slate">
+                      <div className="mt-4 flex flex-col gap-2 text-xs text-taskor-slate sm:flex-row sm:items-center sm:justify-between">
                         <span>
                           Due:{" "}
                           <span className="font-semibold text-taskor-ink">
@@ -221,16 +224,17 @@ export default function TasksPage() {
                         </span>
                       </div>
 
-                      <div className="mt-4 flex flex-wrap gap-2">
+                      <div className="mt-4 flex flex-wrap gap-2 [&_span]:whitespace-normal">
                         {columns
                           .filter((status) => status !== task.status)
                           .map((status) => (
-                            <button
+                        <button
                               key={status}
                               onClick={() => moveTask(task, status)}
-                              className="rounded-btn border border-taskor-mist px-2.5 py-2 text-xs font-medium text-taskor-ink"
+                              className="inline-flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-btn border border-taskor-mist px-2.5 py-2 text-xs font-medium text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple sm:flex-none"
                             >
-                              Move to {status}
+                              <ArrowRight size={13} />
+                              <span>Move to {status}</span>
                             </button>
                           ))}
                       </div>
@@ -238,15 +242,19 @@ export default function TasksPage() {
                       <div className="mt-4 flex gap-2">
                         <button
                           onClick={() => openEditModal(task)}
-                          className="rounded-btn border border-taskor-mist px-3 py-2 text-xs font-medium text-taskor-ink"
+                          className="inline-grid h-9 w-9 place-items-center rounded-xl border border-taskor-mist text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple"
+                          title="Edit task"
+                          aria-label={`Edit ${task.title}`}
                         >
-                          Edit
+                          <Pencil size={15} />
                         </button>
                         <button
                           onClick={() => handleDelete(task._id)}
-                          className="rounded-btn border border-red-200 px-3 py-2 text-xs font-medium text-red-600"
+                          className="inline-grid h-9 w-9 place-items-center rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50"
+                          title="Delete task"
+                          aria-label={`Delete ${task.title}`}
                         >
-                          Delete
+                          <Trash2 size={15} />
                         </button>
                       </div>
                     </div>
@@ -264,7 +272,7 @@ export default function TasksPage() {
 
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-taskor-ink/40 p-4">
-          <div className="w-full max-w-3xl rounded-3xl bg-white p-6 shadow-2xl">
+          <div className="glass-panel w-full max-w-3xl rounded-3xl p-4 shadow-2xl sm:p-6">
             <div className="mb-6 flex items-start justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-taskor-ink">
@@ -274,8 +282,12 @@ export default function TasksPage() {
                   Keep your execution pipeline organized.
                 </p>
               </div>
-              <button onClick={closeModal} className="text-2xl leading-none text-taskor-slate">
-                ×
+              <button
+                onClick={closeModal}
+                className="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl text-taskor-slate transition hover:bg-taskor-cloud hover:text-taskor-ink"
+                aria-label="Close modal"
+              >
+                <X size={20} />
               </button>
             </div>
 
@@ -369,18 +381,18 @@ export default function TasksPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="rounded-btn border border-taskor-mist px-4 py-3 text-sm font-medium text-taskor-ink"
+                  className="inline-flex min-h-11 items-center justify-center rounded-btn border border-taskor-mist px-4 py-3 text-sm font-medium text-taskor-ink"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white"
+                  className="inline-flex min-h-11 items-center justify-center rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white"
                 >
                   {saving ? "Saving..." : editingTask ? "Update Task" : "Create Task"}
                 </button>
@@ -392,3 +404,5 @@ export default function TasksPage() {
     </div>
   );
 }
+
+

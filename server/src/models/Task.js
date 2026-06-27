@@ -13,6 +13,11 @@ const taskSchema = new mongoose.Schema(
       ref: "Project",
       default: null,
     },
+    projectName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     title: {
       type: String,
       required: [true, "Task title is required"],
@@ -20,8 +25,8 @@ const taskSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default: "",
       trim: true,
+      default: "",
     },
     status: {
       type: String,

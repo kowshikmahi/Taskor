@@ -1,96 +1,116 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 const projects = [
   {
     name: "Taskor Landing Page",
     client: "Internal",
-    status: "In Progress",
+    progress: 92,
     due: "28 Jun",
+    status: "Completed",
   },
   {
-    name: "E-commerce Redesign",
-    client: "BlueCart",
-    status: "Review",
-    due: "30 Jun",
+    name: "Mobile Dashboard",
+    client: "Acme Inc.",
+    progress: 74,
+    due: "03 Jul",
+    status: "In Progress",
   },
   {
-    name: "Clinic Dashboard",
-    client: "OptiCare",
+    name: "CRM Integration",
+    client: "TechNova",
+    progress: 48,
+    due: "12 Jul",
     status: "Planning",
-    due: "04 Jul",
-  },
-  {
-    name: "SEO Portfolio Revamp",
-    client: "Personal Brand",
-    status: "Done",
-    due: "18 Jun",
   },
 ];
 
-function badgeStyles(status) {
-  switch (status) {
-    case "Done":
-      return "bg-green-100 text-green-700";
-    case "Review":
-      return "bg-amber-100 text-amber-700";
-    case "Planning":
-      return "bg-sky-100 text-sky-700";
-    default:
-      return "bg-violet-100 text-violet-700";
-  }
-}
-
 export default function ProjectTable() {
   return (
-    <div className="rounded-3xl border border-taskor-mist bg-white p-6 shadow-card">
-      <div className="mb-5 flex items-center justify-between">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="glass rounded-[28px] p-8 shadow-card"
+    >
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-xl font-bold text-taskor-ink">Active Projects</h2>
-          <p className="mt-1 text-sm text-taskor-slate">
-            Track project status, deadlines, and delivery stage.
+          <h2 className="text-2xl font-bold text-taskor-ink">
+            Recent Projects
+          </h2>
+
+          <p className="text-slate-500 mt-1">
+            Latest project progress
           </p>
         </div>
-        <button className="text-sm font-semibold text-taskor-purple hover:underline">
-          View all
+
+        <button className="text-taskor-purple font-semibold">
+          View All
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-y-3">
-          <thead>
-            <tr className="text-left text-sm text-taskor-slate">
-              <th className="pb-2 font-semibold">Project</th>
-              <th className="pb-2 font-semibold">Client</th>
-              <th className="pb-2 font-semibold">Status</th>
-              <th className="pb-2 font-semibold">Due</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.map((project) => (
-              <tr key={project.name}>
-                <td className="rounded-l-2xl bg-taskor-cloud px-4 py-4 font-semibold text-taskor-ink">
+      <div className="space-y-8">
+
+        {projects.map((project) => (
+
+          <div key={project.name}>
+
+            <div className="flex justify-between mb-3">
+
+              <div>
+
+                <h3 className="font-semibold">
+
                   {project.name}
-                </td>
-                <td className="bg-taskor-cloud px-4 py-4 text-taskor-slate">
+
+                </h3>
+
+                <p className="text-sm text-slate-500">
+
                   {project.client}
-                </td>
-                <td className="bg-taskor-cloud px-4 py-4">
-                  <span
-                    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${badgeStyles(
-                      project.status
-                    )}`}
-                  >
-                    {project.status}
-                  </span>
-                </td>
-                <td className="rounded-r-2xl bg-taskor-cloud px-4 py-4 text-taskor-slate">
+
+                </p>
+
+              </div>
+
+              <div className="text-right">
+
+                <p className="font-semibold">
+
+                  {project.progress}%
+
+                </p>
+
+                <p className="text-xs text-slate-400">
+
                   {project.due}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+                </p>
+
+              </div>
+
+            </div>
+
+            <div className="h-3 rounded-full bg-slate-200 overflow-hidden">
+
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{
+                  width: `${project.progress}%`,
+                }}
+                transition={{
+                  duration: 1,
+                }}
+                className="h-full bg-taskor-gradient rounded-full"
+              />
+
+            </div>
+
+          </div>
+
+        ))}
+
       </div>
-    </div>
+
+    </motion.div>
   );
 }

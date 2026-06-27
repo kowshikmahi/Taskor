@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Client from "../models/Client.js";
 
 export async function getClients(req, res) {
@@ -12,6 +13,10 @@ export async function getClients(req, res) {
 
 export async function getClientById(req, res) {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid client id" });
+    }
+
     const client = await Client.findOne({
       _id: req.params.id,
       user: req.user._id,
@@ -55,6 +60,10 @@ export async function createClient(req, res) {
 
 export async function updateClient(req, res) {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid client id" });
+    }
+
     const { name, company, email, phone, status, notes } = req.body;
 
     const client = await Client.findOne({
@@ -66,7 +75,12 @@ export async function updateClient(req, res) {
       return res.status(404).json({ message: "Client not found" });
     }
 
-    if (name !== undefined) client.name = name.trim();
+    if (name !== undefined) {
+      if (!name.trim()) {
+        return res.status(400).json({ message: "Client name is required" });
+      }
+      client.name = name.trim();
+    }
     if (company !== undefined) client.company = company.trim();
     if (email !== undefined) client.email = email.trim().toLowerCase();
     if (phone !== undefined) client.phone = phone.trim();
@@ -84,6 +98,10 @@ export async function updateClient(req, res) {
 
 export async function deleteClient(req, res) {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid client id" });
+    }
+
     const client = await Client.findOne({
       _id: req.params.id,
       user: req.user._id,

@@ -1,35 +1,75 @@
+import { motion } from "framer-motion";
 import React from "react";
 
-const activity = [
-  "BlueCart project moved to Review",
-  "Invoice #102 sent to OptiCare",
-  "New task added to SEO Portfolio Revamp",
-  "Client feedback received for Landing Page",
+const activities = [
+  {
+    title: "New Client Added",
+    time: "2 min ago",
+  },
+  {
+    title: "Project Completed",
+    time: "15 min ago",
+  },
+  {
+    title: "Task Assigned",
+    time: "1 hour ago",
+  },
+  {
+    title: "Invoice Generated",
+    time: "Yesterday",
+  },
 ];
 
 export default function ActivityCard() {
   return (
-    <div className="rounded-3xl border border-taskor-mist bg-white p-6 shadow-card">
-      <div className="mb-5">
-        <h2 className="text-xl font-bold text-taskor-ink">Recent Activity</h2>
-        <p className="mt-1 text-sm text-taskor-slate">
-          Latest updates across your workspace.
-        </p>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="glass rounded-[28px] p-8 shadow-card"
+    >
+      <h2 className="text-2xl font-bold mb-8">
+
+        Recent Activity
+
+      </h2>
+
+      <div className="space-y-7">
+
+        {activities.map((activity) => (
+
+          <div
+            key={activity.title}
+            className="flex gap-4"
+          >
+
+            <div className="mt-1">
+
+              <div className="h-3 w-3 rounded-full bg-taskor-purple"></div>
+
+            </div>
+
+            <div>
+
+              <h3 className="font-semibold">
+
+                {activity.title}
+
+              </h3>
+
+              <p className="text-sm text-slate-500">
+
+                {activity.time}
+
+              </p>
+
+            </div>
+
+          </div>
+
+        ))}
+
       </div>
 
-      <div className="space-y-4">
-        {activity.map((item, index) => (
-          <div key={item} className="flex gap-3">
-            <div className="mt-1.5 h-2.5 w-2.5 rounded-full bg-taskor-purple" />
-            <div>
-              <p className="text-sm font-medium text-taskor-ink">{item}</p>
-              <p className="mt-1 text-xs text-taskor-slate">
-                {index + 1}h ago
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    </motion.div>
   );
 }

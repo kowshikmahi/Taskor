@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import Task from "../models/Task.js";
+import Project from "../models/Project.js";
 
 export async function getTasks(req, res) {
   try {
@@ -12,6 +14,10 @@ export async function getTasks(req, res) {
 
 export async function getTaskById(req, res) {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid task id" });
+    }
+
     const task = await Task.findOne({
       _id: req.params.id,
       user: req.user._id,
@@ -30,17 +36,35 @@ export async function getTaskById(req, res) {
 
 export async function createTask(req, res) {
   try {
-    const { title, description, projectName, status, priority, dueDate } = req.body;
+    const { title, description, project, projectName, status, priority, dueDate } = req.body;
 
     if (!title?.trim()) {
       return res.status(400).json({ message: "Task title is required" });
+    }
+
+    let validProject = null;
+
+    if (project) {
+      if (!mongoose.isValidObjectId(project)) {
+        return res.status(400).json({ message: "Invalid project selected" });
+      }
+
+      validProject = await Project.findOne({
+        _id: project,
+        user: req.user._id,
+      });
+
+      if (!validProject) {
+        return res.status(400).json({ message: "Invalid project selected" });
+      }
     }
 
     const task = await Task.create({
       user: req.user._id,
       title: title.trim(),
       description: description?.trim() || "",
-      projectName: projectName?.trim() || "",
+      project: validProject ? validProject._id : null,
+      projectName: validProject?.name || projectName?.trim() || "",
       status: status || "Todo",
       priority: priority || "Medium",
       dueDate: dueDate || null,
@@ -55,7 +79,11 @@ export async function createTask(req, res) {
 
 export async function updateTask(req, res) {
   try {
-    const { title, description, projectName, status, priority, dueDate } = req.body;
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid task id" });
+    }
+
+    const { title, description, project, projectName, status, priority, dueDate } = req.body;
 
     const task = await Task.findOne({
       _id: req.params.id,
@@ -66,8 +94,32 @@ export async function updateTask(req, res) {
       return res.status(404).json({ message: "Task not found" });
     }
 
+    if (title !== undefined && !title.trim()) {
+      return res.status(400).json({ message: "Task title is required" });
+    }
     if (title !== undefined) task.title = title.trim();
     if (description !== undefined) task.description = description.trim();
+    if (project !== undefined) {
+      if (!project) {
+        task.project = null;
+      } else {
+        if (!mongoose.isValidObjectId(project)) {
+          return res.status(400).json({ message: "Invalid project selected" });
+        }
+
+        const validProject = await Project.findOne({
+          _id: project,
+          user: req.user._id,
+        });
+
+        if (!validProject) {
+          return res.status(400).json({ message: "Invalid project selected" });
+        }
+
+        task.project = validProject._id;
+        task.projectName = validProject.name;
+      }
+    }
     if (projectName !== undefined) task.projectName = projectName.trim();
     if (status !== undefined) task.status = status;
     if (priority !== undefined) task.priority = priority;
@@ -84,6 +136,10 @@ export async function updateTask(req, res) {
 
 export async function deleteTask(req, res) {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid task id" });
+    }
+
     const task = await Task.findOne({
       _id: req.params.id,
       user: req.user._id,

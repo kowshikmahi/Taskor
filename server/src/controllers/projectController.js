@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Project from "../models/Project.js";
 import Client from "../models/Client.js";
 
@@ -16,6 +17,10 @@ export async function getProjects(req, res) {
 
 export async function getProjectById(req, res) {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid project id" });
+    }
+
     const project = await Project.findOne({
       _id: req.params.id,
       user: req.user._id,
@@ -43,6 +48,10 @@ export async function createProject(req, res) {
     let validClient = null;
 
     if (client) {
+      if (!mongoose.isValidObjectId(client)) {
+        return res.status(400).json({ message: "Invalid client selected" });
+      }
+
       validClient = await Client.findOne({
         _id: client,
         user: req.user._id,
@@ -77,6 +86,10 @@ export async function createProject(req, res) {
 
 export async function updateProject(req, res) {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid project id" });
+    }
+
     const { client, name, description, status, progress, dueDate } = req.body;
 
     const project = await Project.findOne({
@@ -92,6 +105,10 @@ export async function updateProject(req, res) {
       if (!client) {
         project.client = null;
       } else {
+        if (!mongoose.isValidObjectId(client)) {
+          return res.status(400).json({ message: "Invalid client selected" });
+        }
+
         const validClient = await Client.findOne({
           _id: client,
           user: req.user._id,
@@ -105,7 +122,12 @@ export async function updateProject(req, res) {
       }
     }
 
-    if (name !== undefined) project.name = name.trim();
+    if (name !== undefined) {
+      if (!name.trim()) {
+        return res.status(400).json({ message: "Project name is required" });
+      }
+      project.name = name.trim();
+    }
     if (description !== undefined) project.description = description.trim();
     if (status !== undefined) project.status = status;
     if (progress !== undefined) project.progress = progress;
@@ -127,6 +149,10 @@ export async function updateProject(req, res) {
 
 export async function deleteProject(req, res) {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid project id" });
+    }
+
     const project = await Project.findOne({
       _id: req.params.id,
       user: req.user._id,

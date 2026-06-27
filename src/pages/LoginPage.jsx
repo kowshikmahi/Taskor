@@ -48,7 +48,7 @@ export default function LoginPage() {
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl overflow-hidden rounded-[36px] bg-white shadow-2xl">
         <div className="hidden w-1/2 flex-col justify-between bg-taskor-gradient p-10 text-white lg:flex">
           <div>
-            <TaskorLogo variant="full-light" className="h-10 w-auto" />
+            <TaskorLogo variant="full-light" size="lg" className="max-w-[158px]" />
             <p className="mt-6 max-w-md text-sm leading-7 text-white/85">
               Welcome back to Taskor. Manage client work, projects, and tasks from one calm command center.
             </p>
@@ -64,6 +64,10 @@ export default function LoginPage() {
 
         <div className="flex w-full items-center justify-center p-8 sm:p-12 lg:w-1/2">
           <div className="w-full max-w-md">
+            <Link to="/" className="mb-8 inline-flex lg:hidden">
+              <TaskorLogo size="lg" className="max-w-[150px]" />
+            </Link>
+            
             <div className="mb-8">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-taskor-purple">
                 Welcome back
@@ -128,3 +132,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+

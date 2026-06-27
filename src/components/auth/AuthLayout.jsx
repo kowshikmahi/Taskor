@@ -19,7 +19,7 @@ export default function AuthLayout({
           
           <div className="relative flex w-full flex-col justify-between p-10 text-white xl:p-14">
             <div>
-              <TaskorLogo variant="full" theme="dark" className="h-10 w-auto" />
+              <TaskorLogo variant="full" theme="dark" size="lg" className="max-w-[158px]" />
             </div>
 
             <div className="max-w-xl">
@@ -61,7 +61,7 @@ export default function AuthLayout({
         <div className="flex items-center justify-center px-6 py-10 sm:px-8 lg:px-12">
           <div className="w-full max-w-md">
             <Link to="/" className="mb-8 inline-flex lg:hidden">
-              <TaskorLogo variant="full" className="h-9 w-auto" />
+              <TaskorLogo variant="full" size="lg" className="max-w-[150px]" />
             </Link>
 
             <div className="rounded-[28px] border border-taskor-mist bg-white p-8 shadow-card sm:p-10">

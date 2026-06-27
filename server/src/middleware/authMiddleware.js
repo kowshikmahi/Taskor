@@ -10,7 +10,14 @@ export async function protect(req, res, next) {
     }
 
     const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded?.userId) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
 
     const user = await User.findById(decoded.userId).select("-password");
 

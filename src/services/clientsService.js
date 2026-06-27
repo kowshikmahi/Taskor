@@ -1,25 +1,24 @@
-import { apiRequest } from "../lib/api";
+import api from "../lib/api";
 
-export async function getClients() {
-  return apiRequest("/clients");
-}
+export const getClients = () =>
+  api("/clients");
 
-export async function createClient(clientData) {
-  return apiRequest("/clients", {
+export const createClient = (body) =>
+  api("/clients", {
     method: "POST",
-    body: JSON.stringify(clientData),
+    body: JSON.stringify(body),
   });
-}
 
-export async function updateClient(clientId, clientData) {
-  return apiRequest(`/clients/${clientId}`, {
+export const updateClient = (
+  id,
+  body
+) =>
+  api(`/clients/${id}`, {
     method: "PUT",
-    body: JSON.stringify(clientData),
+    body: JSON.stringify(body),
   });
-}
 
-export async function deleteClient(clientId) {
-  return apiRequest(`/clients/${clientId}`, {
+export const deleteClient = (id) =>
+  api(`/clients/${id}`, {
     method: "DELETE",
   });
-}

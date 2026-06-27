@@ -1,59 +1,91 @@
 import React from "react";
+import { LayoutDashboard, Users, FolderKanban, CheckSquare, LogOut } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import TaskorLogo from "../brand/TaskorLogo";
 import { useAuth } from "../../context/AuthContext";
 
-const navItems = [
-  { name: "Overview", to: "/app" },
-  { name: "Clients", to: "/app/clients" },
-  { name: "Projects", to: "/app/projects" },
-  { name: "Tasks", to: "/app/tasks" },
+const menus = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/app",
+    end: true,
+  },
+  {
+    title: "Clients",
+    icon: Users,
+    path: "/app/clients",
+  },
+  {
+    title: "Projects",
+    icon: FolderKanban,
+    path: "/app/projects",
+  },
+  {
+    title: "Tasks",
+    icon: CheckSquare,
+    path: "/app/tasks",
+  },
 ];
 
 export default function Sidebar() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
     logout();
-    navigate("/login");
+    navigate("/login", { replace: true });
   }
 
   return (
-    <aside className="flex h-full w-[260px] flex-col border-r border-taskor-mist bg-white px-5 py-6">
-      <div className="mb-8">
-        <TaskorLogo variant="full" className="h-9 w-auto" />
+    <aside className="glass-panel fixed left-0 top-0 z-40 flex h-dvh w-72 max-w-[86vw] flex-col border-r border-white/45">
+      <div className="px-6 py-5 sm:px-8 sm:py-6">
+        <TaskorLogo size="lg" className="max-w-[148px]" />
       </div>
 
-      <nav className="flex-1 space-y-2">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.name}
-            to={item.to}
-            end={item.to === "/app"}
-            className={({ isActive }) =>
-              `flex items-center rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                isActive
-                  ? "bg-taskor-gradient text-white shadow-card"
-                  : "text-taskor-slate hover:bg-taskor-cloud"
-              }`
-            }
-          >
-            {item.name}
-          </NavLink>
-        ))}
+      <nav className="flex-1 overflow-y-auto px-4 sm:px-5">
+        {menus.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <NavLink
+              key={item.title}
+              to={item.path}
+              end={item.end}
+              className={({ isActive }) =>
+                `mb-2 flex min-h-12 items-center gap-4 rounded-2xl px-4 py-3 font-semibold transition-all sm:px-5 sm:py-4 ${
+                  isActive
+                    ? "bg-taskor-gradient text-white shadow-card"
+                    : "text-[var(--muted)] hover:bg-white/45 hover:text-taskor-purple dark:hover:bg-white/10"
+                }`
+              }
+            >
+              <Icon size={20} />
+              <span>{item.title}</span>
+            </NavLink>
+          );
+        })}
       </nav>
 
-      <div className="mt-8 rounded-3xl border border-taskor-mist bg-taskor-cloud p-4">
-        <p className="text-sm font-semibold text-taskor-ink">{user?.name || "Taskor User"}</p>
-        <p className="mt-1 text-xs text-taskor-slate">{user?.email}</p>
+      <div className="border-t border-white/40 p-4 sm:p-5">
+        <div className="glass flex items-center gap-3 rounded-2xl p-3 sm:gap-4 sm:p-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-taskor-gradient text-lg font-bold text-white">
+            K
+          </div>
 
-        <button
-          onClick={handleLogout}
-          className="mt-4 w-full rounded-btn border border-taskor-mist px-4 py-2.5 text-sm font-semibold text-taskor-slate transition hover:bg-white"
-        >
-          Logout
-        </button>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate font-semibold text-[var(--text)]">Kowshik</h3>
+            <p className="truncate text-sm text-[var(--muted)]">Founder</p>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl text-[var(--muted)] transition hover:bg-white/60 hover:text-taskor-purple dark:hover:bg-white/10"
+            aria-label="Log out"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
       </div>
     </aside>
   );

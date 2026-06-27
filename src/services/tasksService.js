@@ -1,25 +1,24 @@
-import { apiRequest } from "../lib/api";
+import api from "../lib/api";
 
-export async function getTasks() {
-  return apiRequest("/tasks");
-}
+export const getTasks = () =>
+  api("/tasks");
 
-export async function createTask(taskData) {
-  return apiRequest("/tasks", {
+export const createTask = (body) =>
+  api("/tasks", {
     method: "POST",
-    body: JSON.stringify(taskData),
+    body: JSON.stringify(body),
   });
-}
 
-export async function updateTask(taskId, taskData) {
-  return apiRequest(`/tasks/${taskId}`, {
+export const updateTask = (
+  id,
+  body
+) =>
+  api(`/tasks/${id}`, {
     method: "PUT",
-    body: JSON.stringify(taskData),
+    body: JSON.stringify(body),
   });
-}
 
-export async function deleteTask(taskId) {
-  return apiRequest(`/tasks/${taskId}`, {
+export const deleteTask = (id) =>
+  api(`/tasks/${id}`, {
     method: "DELETE",
   });
-}

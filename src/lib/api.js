@@ -1,23 +1,36 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const BASE_URL =
+import.meta.env.VITE_API_URL ||
+"http://localhost:5000/api";
 
-export async function apiRequest(path, options = {}) {
+async function request(
+  endpoint,
+  options = {}
+) {
   const token = localStorage.getItem("taskor_token");
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: options.method || "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-    body: options.body,
-  });
+  const response = await fetch(
+    `${BASE_URL}${endpoint}`,
+    {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && {
+          Authorization: `Bearer ${token}`,
+        }),
+        ...(options.headers || {}),
+      },
+    }
+  );
 
-  const data = await response.json().catch(() => ({}));
+  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Something went wrong");
+    throw new Error(
+      data.message || "Something went wrong."
+    );
   }
 
   return data;
 }
+
+export default request;

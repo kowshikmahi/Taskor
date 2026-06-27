@@ -1,19 +1,24 @@
-import { apiRequest } from "../lib/api";
+import api from "../lib/api";
 
-export async function signupUser(payload) {
-  return apiRequest("/auth/signup", {
+export const login = (email, password) =>
+  api("/auth/login", {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      email,
+      password,
+    }),
   });
-}
 
-export async function loginUser(payload) {
-  return apiRequest("/auth/login", {
+export const signup = (body) =>
+  api("/auth/register", {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   });
-}
 
-export async function getCurrentUser() {
-  return apiRequest("/auth/me");
-}
+export const profile = () =>
+  api("/auth/profile");
+
+// Aliases used by AuthContext
+export const loginUser = login;
+export const signupUser = signup;
+export const getCurrentUser = profile;

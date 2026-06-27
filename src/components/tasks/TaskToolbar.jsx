@@ -1,43 +1,46 @@
 import React from "react";
+import { Search } from "lucide-react";
 
-export default function TaskToolbar({
-  search,
-  setSearch,
-  priority,
-  setPriority,
-}) {
+export default function TaskToolbar() {
   return (
-    <section className="rounded-3xl border border-taskor-mist bg-white p-5 shadow-card">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="w-full lg:max-w-xl">
-          <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-            Search tasks
-          </label>
-          <input
-            type="text"
-            placeholder="Search by task, project, or client"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-btn border border-taskor-mist bg-white px-4 py-3 text-taskor-ink outline-none transition focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10"
+    <div className="glass rounded-[24px] p-5 shadow-card mb-8">
+
+      <div className="grid md:grid-cols-3 gap-5">
+
+        <div className="relative">
+
+          <Search
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
           />
+
+          <input
+            placeholder="Search task..."
+            className="input pl-11"
+          />
+
         </div>
 
-        <div className="w-full lg:max-w-xs">
-          <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-            Filter by priority
-          </label>
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-            className="w-full rounded-btn border border-taskor-mist bg-white px-4 py-3 text-taskor-ink outline-none transition focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10"
-          >
-            <option value="All">All</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
-        </div>
+        <select className="input">
+
+          <option>All Priorities</option>
+
+          <option>High</option>
+
+          <option>Medium</option>
+
+          <option>Low</option>
+
+        </select>
+
+        <select className="input">
+
+          <option>All Projects</option>
+
+        </select>
+
       </div>
-    </section>
+
+    </div>
   );
 }

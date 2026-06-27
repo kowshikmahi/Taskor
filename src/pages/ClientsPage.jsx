@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { createClient, deleteClient, getClients, updateClient } from "../services/clientsService";
 
 const emptyForm = {
@@ -113,8 +114,8 @@ export default function ClientsPage() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 rounded-3xl bg-white p-6 shadow-card md:flex-row md:items-center md:justify-between">
+    <div className="space-y-5 sm:space-y-6">
+      <div className="flex flex-col gap-4 glass rounded-3xl p-5 shadow-card sm:p-6 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-taskor-purple">
             Client workspace
@@ -127,28 +128,29 @@ export default function ClientsPage() {
 
         <button
           onClick={openCreateModal}
-          className="rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white shadow-card"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white shadow-card sm:w-auto"
         >
-          + Add Client
+          <Plus size={18} />
+          <span>Add Client</span>
         </button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-3xl bg-white p-5 shadow-card">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="glass rounded-3xl p-5 shadow-card">
           <p className="text-sm text-taskor-slate">Total Clients</p>
           <p className="mt-3 text-3xl font-bold text-taskor-ink">{clients.length}</p>
         </div>
-        <div className="rounded-3xl bg-white p-5 shadow-card">
+        <div className="glass rounded-3xl p-5 shadow-card">
           <p className="text-sm text-taskor-slate">Active Clients</p>
           <p className="mt-3 text-3xl font-bold text-taskor-ink">{activeCount}</p>
         </div>
-        <div className="rounded-3xl bg-white p-5 shadow-card">
+        <div className="glass rounded-3xl p-5 shadow-card">
           <p className="text-sm text-taskor-slate">Leads / Inactive</p>
           <p className="mt-3 text-3xl font-bold text-taskor-ink">{clients.length - activeCount}</p>
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-card">
+      <div className="glass rounded-3xl p-5 shadow-card sm:p-6">
         {loading ? (
           <p className="text-sm text-taskor-slate">Loading clients...</p>
         ) : error ? (
@@ -163,8 +165,52 @@ export default function ClientsPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left">
+          <>
+            <div className="grid gap-3 md:hidden">
+              {clients.map((client) => (
+                <div
+                  key={client._id}
+                  className="rounded-2xl border border-white/55 bg-white/45 p-4 backdrop-blur dark:bg-white/10"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-base font-bold text-taskor-ink">{client.name}</h3>
+                      <p className="mt-1 text-sm text-taskor-slate">{client.company || "No company"}</p>
+                    </div>
+                    <span className="flex-shrink-0 rounded-full bg-taskor-cloud px-3 py-1 text-xs font-semibold text-taskor-ink">
+                      {client.status}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-2 text-sm text-taskor-slate">
+                    <p className="truncate">{client.email || "No email"}</p>
+                    <p>{client.phone || "No phone"}</p>
+                  </div>
+
+                  <div className="mt-4 flex gap-2">
+                    <button
+                      onClick={() => openEditModal(client)}
+                      className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-taskor-mist text-sm font-semibold text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple"
+                      aria-label={`Edit ${client.name}`}
+                    >
+                      <Pencil size={15} />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(client._id)}
+                      className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-red-200 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                      aria-label={`Delete ${client.name}`}
+                    >
+                      <Trash2 size={15} />
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden overflow-x-auto md:block">
+              <table className="min-w-[760px] text-left">
               <thead>
                 <tr className="border-b border-taskor-mist text-sm text-taskor-slate">
                   <th className="px-4 py-3 font-semibold">Client</th>
@@ -179,9 +225,9 @@ export default function ClientsPage() {
                 {clients.map((client) => (
                   <tr key={client._id} className="border-b border-taskor-cloud/70">
                     <td className="px-4 py-4 font-semibold text-taskor-ink">{client.name}</td>
-                    <td className="px-4 py-4 text-taskor-slate">{client.company || "—"}</td>
-                    <td className="px-4 py-4 text-taskor-slate">{client.email || "—"}</td>
-                    <td className="px-4 py-4 text-taskor-slate">{client.phone || "—"}</td>
+                    <td className="px-4 py-4 text-taskor-slate">{client.company || "-"}</td>
+                    <td className="px-4 py-4 text-taskor-slate">{client.email || "-"}</td>
+                    <td className="px-4 py-4 text-taskor-slate">{client.phone || "-"}</td>
                     <td className="px-4 py-4">
                       <span className="rounded-full bg-taskor-cloud px-3 py-1 text-xs font-semibold text-taskor-ink">
                         {client.status}
@@ -191,29 +237,34 @@ export default function ClientsPage() {
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => openEditModal(client)}
-                          className="rounded-btn border border-taskor-mist px-3 py-2 text-sm font-medium text-taskor-ink"
+                          className="inline-grid h-10 w-10 place-items-center rounded-xl border border-taskor-mist text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple"
+                          title="Edit client"
+                          aria-label={`Edit ${client.name}`}
                         >
-                          Edit
+                          <Pencil size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(client._id)}
-                          className="rounded-btn border border-red-200 px-3 py-2 text-sm font-medium text-red-600"
+                          className="inline-grid h-10 w-10 place-items-center rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50"
+                          title="Delete client"
+                          aria-label={`Delete ${client.name}`}
                         >
-                          Delete
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-taskor-ink/40 p-4">
-          <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl">
+          <div className="glass-panel w-full max-w-2xl rounded-3xl p-4 shadow-2xl sm:p-6">
             <div className="mb-6 flex items-start justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-taskor-ink">
@@ -223,8 +274,12 @@ export default function ClientsPage() {
                   Save client details for your workspace.
                 </p>
               </div>
-              <button onClick={closeModal} className="text-2xl leading-none text-taskor-slate">
-                ×
+              <button
+                onClick={closeModal}
+                className="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl text-taskor-slate transition hover:bg-taskor-cloud hover:text-taskor-ink"
+                aria-label="Close modal"
+              >
+                <X size={20} />
               </button>
             </div>
 
@@ -296,18 +351,18 @@ export default function ClientsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="rounded-btn border border-taskor-mist px-4 py-3 text-sm font-medium text-taskor-ink"
+                  className="inline-flex min-h-11 items-center justify-center rounded-btn border border-taskor-mist px-4 py-3 text-sm font-medium text-taskor-ink"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white"
+                  className="inline-flex min-h-11 items-center justify-center rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white"
                 >
                   {saving ? "Saving..." : editingClient ? "Update Client" : "Create Client"}
                 </button>
@@ -319,3 +374,6 @@ export default function ClientsPage() {
     </div>
   );
 }
+
+
+

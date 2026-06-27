@@ -1,25 +1,24 @@
-import { apiRequest } from "../lib/api";
+import api from "../lib/api";
 
-export async function getProjects() {
-  return apiRequest("/projects");
-}
+export const getProjects = () =>
+  api("/projects");
 
-export async function createProject(projectData) {
-  return apiRequest("/projects", {
+export const createProject = (body) =>
+  api("/projects", {
     method: "POST",
-    body: JSON.stringify(projectData),
+    body: JSON.stringify(body),
   });
-}
 
-export async function updateProject(projectId, projectData) {
-  return apiRequest(`/projects/${projectId}`, {
+export const updateProject = (
+  id,
+  body
+) =>
+  api(`/projects/${id}`, {
     method: "PUT",
-    body: JSON.stringify(projectData),
+    body: JSON.stringify(body),
   });
-}
 
-export async function deleteProject(projectId) {
-  return apiRequest(`/projects/${projectId}`, {
+export const deleteProject = (id) =>
+  api(`/projects/${id}`, {
     method: "DELETE",
   });
-}
