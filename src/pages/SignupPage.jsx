@@ -1,18 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TaskorLogo from "../components/brand/TaskorLogo";
+import ThemeToggle from "../components/ui/ThemeToggle";
 import { useAuth } from "../context/AuthContext";
 
 export default function SignupPage() {
   const navigate = useNavigate();
   const { signup } = useAuth();
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,8 +38,12 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-taskor-cloud px-6 py-10">
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl overflow-hidden rounded-[36px] bg-white shadow-2xl">
+    <div className="relative min-h-screen bg-taskor-cloud px-4 py-6 text-[var(--text)] sm:px-6 sm:py-10">
+      <div className="fixed right-4 top-4 z-50">
+        <ThemeToggle />
+      </div>
+
+      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl overflow-hidden rounded-[28px] bg-white shadow-2xl sm:min-h-[calc(100vh-5rem)] sm:rounded-[36px]">
         <div className="hidden w-1/2 flex-col justify-between bg-taskor-gradient p-10 text-white lg:flex">
           <div>
             <TaskorLogo variant="full-light" size="lg" className="max-w-[158px]" />
@@ -54,25 +54,21 @@ export default function SignupPage() {
 
           <div className="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur">
             <p className="text-sm font-medium text-white/80">Built for modern client work</p>
-            <h3 className="mt-3 text-2xl font-bold leading-tight">
+            <h3 className="mt-3 text-2xl font-bold leading-tight text-white">
               One system for clients, projects, and delivery workflow.
             </h3>
           </div>
         </div>
 
-        <div className="flex w-full items-center justify-center p-8 sm:p-12 lg:w-1/2">
+        <div className="flex w-full items-center justify-center p-6 sm:p-12 lg:w-1/2">
           <div className="w-full max-w-md">
             <Link to="/" className="mb-8 inline-flex lg:hidden">
               <TaskorLogo size="lg" className="max-w-[150px]" />
             </Link>
-            
+
             <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-taskor-purple">
-                Start your workspace
-              </p>
-              <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-taskor-ink">
-                Create your Taskor account
-              </h1>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-taskor-purple">Start your workspace</p>
+              <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-taskor-ink">Create your Taskor account</h1>
               <p className="mt-3 text-sm leading-7 text-taskor-slate">
                 Set up your account and begin managing work from a single dashboard.
               </p>
@@ -87,7 +83,7 @@ export default function SignupPage() {
                   value={form.name}
                   onChange={handleChange}
                   placeholder="Kowshik"
-                  className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10"
+                  className="w-full rounded-btn border border-taskor-mist bg-white/70 px-4 py-3 outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                 />
               </div>
 
@@ -99,7 +95,7 @@ export default function SignupPage() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10"
+                  className="w-full rounded-btn border border-taskor-mist bg-white/70 px-4 py-3 outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                 />
               </div>
 
@@ -111,7 +107,7 @@ export default function SignupPage() {
                   value={form.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10"
+                  className="w-full rounded-btn border border-taskor-mist bg-white/70 px-4 py-3 outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                 />
               </div>
 
@@ -132,9 +128,7 @@ export default function SignupPage() {
 
             <p className="mt-6 text-sm text-taskor-slate">
               Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-taskor-purple hover:underline">
-                Log in
-              </Link>
+              <Link to="/login" className="font-semibold text-taskor-purple hover:underline">Log in</Link>
             </p>
           </div>
         </div>
@@ -142,5 +136,3 @@ export default function SignupPage() {
     </div>
   );
 }
-
-

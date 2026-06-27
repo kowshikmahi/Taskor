@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Bell, Search, Menu, ChevronDown } from "lucide-react";
 import TaskorLogo from "../brand/TaskorLogo";
+import ThemeToggle from "../ui/ThemeToggle";
 
 export default function Topbar({ onMenuClick }) {
   const [search, setSearch] = useState("");
@@ -23,11 +24,7 @@ export default function Topbar({ onMenuClick }) {
           </Link>
 
           <div className="relative hidden w-full max-w-md md:block">
-            <Search
-              size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]"
-            />
-
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
             <input
               type="text"
               placeholder="Search clients, projects or tasks..."
@@ -39,6 +36,8 @@ export default function Topbar({ onMenuClick }) {
         </div>
 
         <div className="flex flex-shrink-0 items-center gap-2 sm:gap-4">
+          <ThemeToggle className="h-11 w-11 rounded-xl sm:h-12 sm:w-12" />
+
           <button
             className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/55 bg-white/65 text-[var(--text)] backdrop-blur transition hover:border-taskor-purple hover:text-taskor-purple dark:bg-white/10 sm:h-12 sm:w-12"
             aria-label="Notifications"
@@ -48,15 +47,11 @@ export default function Topbar({ onMenuClick }) {
           </button>
 
           <button className="flex items-center gap-2 rounded-2xl border border-white/55 bg-white/65 px-2 py-2 text-[var(--text)] backdrop-blur transition hover:border-taskor-purple dark:bg-white/10 sm:gap-3 sm:px-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-taskor-gradient text-sm font-semibold text-white">
-              K
-            </div>
-
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-taskor-gradient text-sm font-semibold text-white">K</div>
             <div className="hidden text-left md:block">
               <p className="font-semibold text-[var(--text)]">Kowshik</p>
               <p className="text-sm text-[var(--muted)]">Administrator</p>
             </div>
-
             <ChevronDown size={18} className="hidden text-[var(--muted)] sm:block" />
           </button>
         </div>

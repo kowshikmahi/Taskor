@@ -116,7 +116,7 @@ export default function FounderSection() {
             initial={{ opacity: 0, x: 60 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="relative mx-auto w-full max-w-[300px] sm:max-w-[320px] lg:max-w-[320px]"
+            className="relative mx-auto w-full max-w-[280px] sm:max-w-[300px] lg:max-w-[300px]"
           >
 
             {/* Glow */}
@@ -127,7 +127,7 @@ export default function FounderSection() {
               <img
                 src={FounderImage}
                 alt="Kowshik Mahi"
-                className="h-72 w-full bg-white/55 object-contain object-center p-2 transition duration-500 hover:scale-[1.02] sm:h-[340px]"
+                className="aspect-[3/4] w-full bg-white/60 object-contain object-center p-2.5 transition duration-500 hover:scale-[1.01] dark:bg-white/10"
               />
 
               <div className="p-4 sm:p-5">
