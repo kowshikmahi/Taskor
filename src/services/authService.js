@@ -10,13 +10,12 @@ export const login = (email, password) =>
   });
 
 export const signup = (body) =>
-  api("/auth/register", {
+  api("/auth/signup", {
     method: "POST",
     body: JSON.stringify(body),
   });
 
-export const profile = () =>
-  api("/auth/profile");
+export const profile = () => api("/auth/me");
 
 // Aliases used by AuthContext
 export const loginUser = login;
