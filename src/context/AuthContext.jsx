@@ -33,21 +33,17 @@ export function AuthProvider({ children }) {
 
   async function signup(name, email, password) {
     const data = await signupUser({ name, email, password });
-
     localStorage.setItem("taskor_token", data.token);
     localStorage.setItem("taskor_user", JSON.stringify(data.user));
     setUser(data.user);
-
     return data.user;
   }
 
   async function login(email, password) {
     const data = await loginUser({ email, password });
-
     localStorage.setItem("taskor_token", data.token);
     localStorage.setItem("taskor_user", JSON.stringify(data.user));
     setUser(data.user);
-
     return data.user;
   }
 
