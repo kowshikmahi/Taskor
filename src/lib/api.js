@@ -1,6 +1,12 @@
-const BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
+const configuredBaseUrl = import.meta.env.VITE_API_URL;
+const fallbackBaseUrl = import.meta.env.DEV ? "http://localhost:5000/api" : "";
+const BASE_URL = (configuredBaseUrl || fallbackBaseUrl).replace(/\/$/, "");
 
 async function request(endpoint, options = {}) {
+  if (!BASE_URL) {
+    throw new Error("Frontend is missing VITE_API_URL. Set it to your deployed Render API URL ending with /api.");
+  }
+
   const token = localStorage.getItem("taskor_token");
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {

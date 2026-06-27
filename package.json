@@ -3,9 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "npm@10",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:frontend": "vite build",
+    "deploy:check": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
