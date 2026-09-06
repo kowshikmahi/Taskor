@@ -4,6 +4,25 @@ dotenv.config();
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
 
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+// Allow requests from your specific Vercel deployment (or use '*' to allow all during development)
+app.use(cors({
+  origin: [
+    'https://taskorapp-2f8f6c9kh-kowshikmahi1209-8877s-projects.vercel.app',
+    // Tip: Add your main production domain here too if using Vercel preview deployments
+    /\.vercel\.app$/ 
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Important: Ensure CORS middleware is placed BEFORE your routes!
+app.use('/auth', authRoutes);
+
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
