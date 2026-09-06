@@ -1,15 +1,27 @@
-const configuredBaseUrl = import.meta.env.VITE_API_URL;
-const fallbackBaseUrl = import.meta.env.DEV ? "http://localhost:5000/api" : "";
-const BASE_URL = (configuredBaseUrl || fallbackBaseUrl).replace(/\/$/, "");
+const envUrl = (import.meta.env.VITE_API_URL || "").trim();
+
+let targetUrl = envUrl;
+
+if (import.meta.env.DEV) {
+  targetUrl = envUrl || "http://localhost:5000";
+} else {
+  // In production, if VITE_API_URL is missing or points to stale taskor-2.onrender.com, use live taskor.onrender.com
+  if (!envUrl || envUrl.includes("taskor-2.onrender.com")) {
+    targetUrl = "https://taskor.onrender.com";
+  }
+}
+
+// Standardize base URL by removing trailing slash and trailing /api (since service endpoints include /api)
+const BASE_URL = targetUrl.replace(/\/$/, "").replace(/\/api$/, "");
 
 async function request(endpoint, options = {}) {
-  if (!BASE_URL) {
-    throw new Error("Frontend is missing VITE_API_URL. Set it to your deployed Render API URL ending with /api.");
-  }
-
   const token = localStorage.getItem("taskor_token");
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  // Ensure endpoint starts with /
+  const formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const fullUrl = `${BASE_URL}${formattedEndpoint}`;
+
+  const response = await fetch(fullUrl, {
     ...options,
     headers: {
       "Content-Type": "application/json",
