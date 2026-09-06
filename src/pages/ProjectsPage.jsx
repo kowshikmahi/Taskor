@@ -38,10 +38,12 @@ export default function ProjectsPage() {
       setError("");
 
       const [projectsData, clientsData] = await Promise.all([getProjects(), getClients()]);
-      setProjects(projectsData);
-      setClients(clientsData);
+      setProjects(Array.isArray(projectsData) ? projectsData : []);
+      setClients(Array.isArray(clientsData) ? clientsData : []);
     } catch (err) {
       setError(err.message || "Failed to load projects");
+      setProjects([]);
+      setClients([]);
     } finally {
       setLoading(false);
     }
@@ -198,32 +200,27 @@ export default function ProjectsPage() {
                   </div>
                 </div>
 
-                <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm text-taskor-slate">
-                    Due:{" "}
-                    <span className="font-semibold text-taskor-ink">
-                      {project.dueDate
-                        ? new Date(project.dueDate).toLocaleDateString()
-                        : "Not set"}
-                    </span>
-                  </p>
+                <div className="mt-5 flex items-center justify-between border-t border-white/40 pt-4">
+                  <span className="text-xs text-taskor-slate">
+                    Due: {project.dueDate ? project.dueDate.slice(0, 10) : "No deadline"}
+                  </span>
 
-                  <div className="flex gap-2 sm:justify-end">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => openEditModal(project)}
-                      className="inline-grid h-10 w-10 place-items-center rounded-xl border border-taskor-mist text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple"
-                      title="Edit project"
+                      className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-taskor-mist px-3 py-1.5 text-xs font-semibold text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple"
                       aria-label={`Edit ${project.name}`}
                     >
-                      <Pencil size={16} />
+                      <Pencil size={14} />
+                      Edit
                     </button>
                     <button
                       onClick={() => handleDelete(project._id)}
-                      className="inline-grid h-10 w-10 place-items-center rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50"
-                      title="Delete project"
+                      className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
                       aria-label={`Delete ${project.name}`}
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={14} />
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -234,77 +231,61 @@ export default function ProjectsPage() {
       </div>
 
       {isModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-taskor-ink/40 p-4">
-          <div className="glass-panel w-full max-w-3xl rounded-3xl p-4 shadow-2xl sm:p-6">
-            <div className="mb-6 flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-taskor-ink">
-                  {editingProject ? "Edit Project" : "Add Project"}
-                </h2>
-                <p className="mt-1 text-sm text-taskor-slate">
-                  Keep your project delivery workflow organized.
-                </p>
-              </div>
-              <button
-                onClick={closeModal}
-                className="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl text-taskor-slate transition hover:bg-taskor-cloud hover:text-taskor-ink"
-                aria-label="Close modal"
-              >
-                <X size={20} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-xl rounded-3xl border border-white/60 bg-white/90 p-6 shadow-2xl backdrop-blur-xl dark:bg-slate-900/90 sm:p-7">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-taskor-ink">
+                {editingProject ? "Edit Project" : "Add Project"}
+              </h2>
+              <button onClick={closeModal} className="rounded-xl p-2 text-taskor-slate hover:bg-white/60">
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                    Project Name
-                  </label>
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
-                  />
-                </div>
+            <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                  Project Name *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="e.g. Website Redesign"
+                  className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
+                />
+              </div>
 
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    rows="4"
-                    value={form.description}
-                    onChange={handleChange}
-                    className="w-full rounded-2xl border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
-                  />
-                </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                  Client
+                </label>
+                <select
+                  name="client"
+                  value={form.client}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
+                >
+                  <option value="">No Client (Internal)</option>
+                  {clients.map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.name} {c.company ? `(${c.company})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">Client</label>
-                  <select
-                    name="client"
-                    value={form.client}
-                    onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
-                  >
-                    <option value="">No client</option>
-                    {clients.map((client) => (
-                      <option key={client._id} value={client._id}>
-                        {client.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">Status</label>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                    Status
+                  </label>
                   <select
                     name="status"
                     value={form.status}
                     onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
+                    className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                   >
                     <option value="Planning">Planning</option>
                     <option value="Active">Active</option>
@@ -314,46 +295,62 @@ export default function ProjectsPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                    Progress (%)
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                    Due Date
                   </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    name="progress"
-                    value={form.progress}
-                    onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">Due Date</label>
                   <input
                     type="date"
                     name="dueDate"
                     value={form.dueDate}
                     onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
+                    className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                  Progress ({form.progress}%)
+                </label>
+                <input
+                  type="range"
+                  name="progress"
+                  min="0"
+                  max="100"
+                  value={form.progress}
+                  onChange={handleChange}
+                  className="w-full accent-taskor-purple"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  rows={3}
+                  value={form.description}
+                  onChange={handleChange}
+                  placeholder="Project scope and details..."
+                  className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
+                />
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="inline-flex min-h-11 items-center justify-center rounded-btn border border-taskor-mist px-4 py-3 text-sm font-medium text-taskor-ink"
+                  className="rounded-2xl border border-taskor-mist px-5 py-2.5 text-sm font-semibold text-taskor-ink hover:bg-white/60"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex min-h-11 items-center justify-center rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white"
+                  className="rounded-2xl bg-taskor-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-card disabled:opacity-70"
                 >
-                  {saving ? "Saving..." : editingProject ? "Update Project" : "Create Project"}
+                  {saving ? "Saving..." : editingProject ? "Save Changes" : "Create Project"}
                 </button>
               </div>
             </form>
@@ -363,6 +360,3 @@ export default function ProjectsPage() {
     </div>
   );
 }
-
-
-

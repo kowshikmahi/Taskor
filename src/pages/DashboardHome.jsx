@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import QuickActions from "../components/dashboard/QuickActions";
@@ -33,18 +32,20 @@ export default function DashboardHome() {
 
   async function loadDashboard() {
     try {
-      const [clientsData, projectsData, tasksData] =
-        await Promise.all([
-          getClients(),
-          getProjects(),
-          getTasks(),
-        ]);
+      const [clientsData, projectsData, tasksData] = await Promise.all([
+        getClients(),
+        getProjects(),
+        getTasks(),
+      ]);
 
-      setClients(clientsData);
-      setProjects(projectsData);
-      setTasks(tasksData);
+      setClients(Array.isArray(clientsData) ? clientsData : []);
+      setProjects(Array.isArray(projectsData) ? projectsData : []);
+      setTasks(Array.isArray(tasksData) ? tasksData : []);
     } catch (error) {
       console.error(error);
+      setClients([]);
+      setProjects([]);
+      setTasks([]);
     } finally {
       setLoading(false);
     }
@@ -55,17 +56,12 @@ export default function DashboardHome() {
   }, [tasks]);
 
   const activeProjects = useMemo(() => {
-    return projects.filter(
-      (project) => project.status === "Active"
-    ).length;
+    return projects.filter((project) => project.status === "Active").length;
   }, [projects]);
 
   const completion = useMemo(() => {
     if (!tasks.length) return 0;
-
-    return Math.round(
-      (completedTasks / tasks.length) * 100
-    );
+    return Math.round((completedTasks / tasks.length) * 100);
   }, [completedTasks, tasks]);
 
   const stats = [
@@ -105,9 +101,7 @@ export default function DashboardHome() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-
       {/* Hero */}
-
       <motion.section
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,9 +109,7 @@ export default function DashboardHome() {
         className="glass rounded-3xl p-5 sm:p-8 lg:p-10"
       >
         <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center lg:gap-10">
-
           <div className="max-w-2xl min-w-0">
-
             <span className="inline-flex items-center px-4 py-2 rounded-full bg-taskor-purple/10 text-taskor-purple font-medium">
               Taskor Workspace
             </span>
@@ -129,13 +121,10 @@ export default function DashboardHome() {
             </h1>
 
             <p className="mt-5 text-lg leading-8 text-taskor-slate">
-              Track clients, organize projects, monitor task progress
-              and manage your complete workflow using one modern
-              productivity platform.
+              Track clients, organize projects, monitor task progress and manage your complete workflow using one modern productivity platform.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-
               <Link to="/app/projects" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto">
                   <Plus size={18} />
@@ -148,21 +137,14 @@ export default function DashboardHome() {
                   View Tasks
                 </Button>
               </Link>
-
             </div>
-
           </div>
 
           {/* Workspace Summary */}
-
           <div className="glass w-full max-w-sm rounded-3xl p-5 sm:p-6 lg:p-7">
-
-            <h3 className="text-xl font-semibold">
-              Workspace Summary
-            </h3>
+            <h3 className="text-xl font-semibold">Workspace Summary</h3>
 
             <div className="mt-8 space-y-6">
-
               <div className="flex justify-between">
                 <span className="text-taskor-slate">Clients</span>
                 <span className="font-semibold">{clients.length}</span>
@@ -182,48 +164,30 @@ export default function DashboardHome() {
                 <span className="font-medium">Productivity</span>
                 <span className="font-bold text-taskor-purple">{completion}%</span>
               </div>
-
             </div>
-
           </div>
-
         </div>
-
       </motion.section>
 
       {/* KPI Cards */}
-
       <section className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
-
         {stats.map((item) => {
-
           const Icon = item.icon;
 
           return (
-
-            <motion.div
-              key={item.title}
-              whileHover={{ y: -5 }}
-            >
-
+            <motion.div key={item.title} whileHover={{ y: -5 }}>
               <Card>
-
                 <div className="flex items-start justify-between gap-4">
-
                   <div className="min-w-0">
-
                     <p className="uppercase tracking-wide text-sm text-taskor-slate">
                       {item.title}
                     </p>
 
-                    <h2 className="mt-3 text-4xl font-bold">
-                      {item.value}
-                    </h2>
+                    <h2 className="mt-3 text-4xl font-bold">{item.value}</h2>
 
                     <p className="mt-2 text-sm text-taskor-slate">
                       {item.subtitle}
                     </p>
-
                   </div>
 
                   <div
@@ -231,31 +195,19 @@ export default function DashboardHome() {
                   >
                     <Icon size={28} className="text-taskor-purple" />
                   </div>
-
                 </div>
-
               </Card>
-
             </motion.div>
-
           );
-
         })}
-
       </section>
 
       {/* Main Content */}
-
       <section className="grid gap-6 xl:grid-cols-3 xl:gap-8">
-
         {/* Recent Projects */}
-
         <div className="xl:col-span-2">
-
           <Card>
-
             <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
-
               <div>
                 <h2 className="text-2xl font-bold">Recent Projects</h2>
                 <p className="text-taskor-slate mt-1">Latest project activity</p>
@@ -268,23 +220,17 @@ export default function DashboardHome() {
                 View All
                 <ArrowRight size={16} />
               </Link>
-
             </div>
 
             <div className="space-y-5">
-
               {projects.length > 0 ? (
-
                 projects.slice(0, 5).map((project) => (
-
                   <motion.div
                     key={project._id}
                     whileHover={{ y: -4 }}
                     className="glass rounded-2xl p-5"
                   >
-
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-
                       <div className="min-w-0">
                         <h3 className="font-semibold text-lg">{project.name}</h3>
                         <p className="text-sm text-taskor-slate mt-1">
@@ -305,14 +251,14 @@ export default function DashboardHome() {
                       >
                         {project.status}
                       </span>
-
                     </div>
 
                     <div className="mt-6">
-
                       <div className="flex justify-between text-sm mb-2">
                         <span className="text-taskor-slate">Progress</span>
-                        <span className="font-semibold text-taskor-purple">{project.progress}%</span>
+                        <span className="font-semibold text-taskor-purple">
+                          {project.progress}%
+                        </span>
                       </div>
 
                       <div className="w-full h-2 rounded-full bg-gray-200 overflow-hidden">
@@ -323,15 +269,10 @@ export default function DashboardHome() {
                           className="h-full bg-taskor-gradient rounded-full"
                         />
                       </div>
-
                     </div>
-
                   </motion.div>
-
                 ))
-
               ) : (
-
                 <div className="text-center py-16">
                   <h3 className="text-xl font-semibold">No Projects Yet</h3>
                   <p className="mt-2 text-taskor-slate">
@@ -344,21 +285,14 @@ export default function DashboardHome() {
                     </Button>
                   </Link>
                 </div>
-
               )}
-
             </div>
-
           </Card>
-
         </div>
 
         {/* Upcoming Tasks */}
-
         <div>
-
           <Card>
-
             <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-2xl font-bold">Upcoming Tasks</h2>
@@ -367,18 +301,13 @@ export default function DashboardHome() {
             </div>
 
             <div className="space-y-4">
-
               {tasks.length > 0 ? (
-
                 tasks.slice(0, 6).map((task) => (
-
                   <div
                     key={task._id}
                     className="glass rounded-2xl p-4 hover:shadow-hover transition"
                   >
-
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
                       <div className="min-w-0">
                         <h3 className="font-medium">{task.title}</h3>
                         <p className="text-sm text-taskor-slate mt-1">
@@ -389,41 +318,27 @@ export default function DashboardHome() {
                       <span className="px-3 py-1 rounded-full bg-taskor-purple/10 text-taskor-purple text-xs font-medium">
                         {task.status}
                       </span>
-
                     </div>
-
                   </div>
-
                 ))
-
               ) : (
-
                 <div className="text-center py-10">
                   <p className="text-taskor-slate">No Tasks Available</p>
                 </div>
-
               )}
-
             </div>
-
           </Card>
-
         </div>
-
       </section>
 
       {/* Quick Actions */}
-
       <section className="mt-8">
         <QuickActions />
       </section>
 
       {/* Productivity */}
-
       <Card>
-
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center lg:gap-8">
-
           <div>
             <h2 className="text-3xl font-bold">Workspace Progress</h2>
             <p className="text-taskor-slate mt-3 max-w-xl">
@@ -432,9 +347,10 @@ export default function DashboardHome() {
           </div>
 
           <div>
-            <h1 className="text-5xl font-bold text-taskor-purple sm:text-6xl">{completion}%</h1>
+            <h1 className="text-5xl font-bold text-taskor-purple sm:text-6xl">
+              {completion}%
+            </h1>
           </div>
-
         </div>
 
         <div className="mt-10">
@@ -447,12 +363,7 @@ export default function DashboardHome() {
             />
           </div>
         </div>
-
       </Card>
-
     </div>
   );
 }
-
-
-

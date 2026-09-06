@@ -35,10 +35,12 @@ export default function TasksPage() {
       setError("");
 
       const [tasksData, projectsData] = await Promise.all([getTasks(), getProjects()]);
-      setTasks(tasksData);
-      setProjects(projectsData);
+      setTasks(Array.isArray(tasksData) ? tasksData : []);
+      setProjects(Array.isArray(projectsData) ? projectsData : []);
     } catch (err) {
       setError(err.message || "Failed to load tasks");
+      setTasks([]);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -198,70 +200,69 @@ export default function TasksPage() {
                   groupedTasks[column].map((task) => (
                     <div key={task._id} className="rounded-3xl border border-white/55 bg-white/45 p-4 backdrop-blur dark:bg-white/10">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
+                        <div className="min-w-0">
                           <h3 className="font-bold text-taskor-ink">{task.title}</h3>
-                          <p className="mt-1 text-xs font-medium text-taskor-purple">
-                            {task.projectName || "No project"}
-                          </p>
+                          <p className="mt-1 text-xs text-taskor-slate">{task.projectName || "General"}</p>
                         </div>
-                        <span className="rounded-full bg-taskor-cloud px-3 py-1 text-[11px] font-semibold text-taskor-ink">
-                          {task.priority}
+
+                        <span
+                          className={`w-fit rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                            task.priority === "High"
+                              ? "bg-red-100 text-red-600"
+                              : task.priority === "Medium"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-emerald-100 text-emerald-700"
+                          }`}
+                        >
+                          {task.priority || "Medium"}
                         </span>
                       </div>
 
-                      <p className="mt-3 text-sm leading-6 text-taskor-slate">
-                        {task.description || "No description added."}
-                      </p>
+                      {task.description ? (
+                        <p className="mt-3 text-xs leading-5 text-taskor-slate">{task.description}</p>
+                      ) : null}
 
-                      <div className="mt-4 flex flex-col gap-2 text-xs text-taskor-slate sm:flex-row sm:items-center sm:justify-between">
-                        <span>
-                          Due:{" "}
-                          <span className="font-semibold text-taskor-ink">
-                            {task.dueDate
-                              ? new Date(task.dueDate).toLocaleDateString()
-                              : "Not set"}
-                          </span>
-                        </span>
-                      </div>
+                      <div className="mt-4 flex items-center justify-between border-t border-white/40 pt-3 text-xs text-taskor-slate">
+                        <span>Due: {task.dueDate ? task.dueDate.slice(0, 10) : "No due date"}</span>
 
-                      <div className="mt-4 flex flex-wrap gap-2 [&_span]:whitespace-normal">
-                        {columns
-                          .filter((status) => status !== task.status)
-                          .map((status) => (
-                        <button
-                              key={status}
-                              onClick={() => moveTask(task, status)}
-                              className="inline-flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-btn border border-taskor-mist px-2.5 py-2 text-xs font-medium text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple sm:flex-none"
+                        <div className="flex items-center gap-1">
+                          {column !== "Done" ? (
+                            <button
+                              onClick={() => {
+                                const nextIndex = columns.indexOf(column) + 1;
+                                if (nextIndex < columns.length) {
+                                  moveTask(task, columns[nextIndex]);
+                                }
+                              }}
+                              className="rounded-lg p-1.5 text-taskor-purple hover:bg-white/60"
+                              title="Move to next status"
+                              aria-label="Move task forward"
                             >
-                              <ArrowRight size={13} />
-                              <span>Move to {status}</span>
+                              <ArrowRight size={14} />
                             </button>
-                          ))}
-                      </div>
+                          ) : null}
 
-                      <div className="mt-4 flex gap-2">
-                        <button
-                          onClick={() => openEditModal(task)}
-                          className="inline-grid h-9 w-9 place-items-center rounded-xl border border-taskor-mist text-taskor-ink transition hover:border-taskor-purple hover:text-taskor-purple"
-                          title="Edit task"
-                          aria-label={`Edit ${task.title}`}
-                        >
-                          <Pencil size={15} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(task._id)}
-                          className="inline-grid h-9 w-9 place-items-center rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50"
-                          title="Delete task"
-                          aria-label={`Delete ${task.title}`}
-                        >
-                          <Trash2 size={15} />
-                        </button>
+                          <button
+                            onClick={() => openEditModal(task)}
+                            className="rounded-lg p-1.5 text-taskor-slate hover:bg-white/60 hover:text-taskor-purple"
+                            aria-label={`Edit ${task.title}`}
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(task._id)}
+                            className="rounded-lg p-1.5 text-red-500 hover:bg-red-50"
+                            aria-label={`Delete ${task.title}`}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-taskor-mist p-5 text-center">
-                    <p className="text-sm text-taskor-slate">No tasks in {column}</p>
+                  <div className="rounded-2xl border border-dashed border-taskor-mist p-4 text-center text-xs text-taskor-slate">
+                    No tasks in {column.toLowerCase()}
                   </div>
                 )}
               </div>
@@ -271,97 +272,81 @@ export default function TasksPage() {
       )}
 
       {isModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-taskor-ink/40 p-4">
-          <div className="glass-panel w-full max-w-3xl rounded-3xl p-4 shadow-2xl sm:p-6">
-            <div className="mb-6 flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-taskor-ink">
-                  {editingTask ? "Edit Task" : "Add Task"}
-                </h2>
-                <p className="mt-1 text-sm text-taskor-slate">
-                  Keep your execution pipeline organized.
-                </p>
-              </div>
-              <button
-                onClick={closeModal}
-                className="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl text-taskor-slate transition hover:bg-taskor-cloud hover:text-taskor-ink"
-                aria-label="Close modal"
-              >
-                <X size={20} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-3xl border border-white/60 bg-white/90 p-6 shadow-2xl backdrop-blur-xl dark:bg-slate-900/90 sm:p-7">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-taskor-ink">
+                {editingTask ? "Edit Task" : "Add Task"}
+              </h2>
+              <button onClick={closeModal} className="rounded-xl p-2 text-taskor-slate hover:bg-white/60">
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                    Task Title
-                  </label>
-                  <input
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
-                  />
-                </div>
+            <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                  Task Title *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={form.title}
+                  onChange={handleChange}
+                  placeholder="e.g. Design homepage hero"
+                  className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
+                />
+              </div>
 
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    rows="4"
-                    value={form.description}
-                    onChange={handleChange}
-                    className="w-full rounded-2xl border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
-                  />
-                </div>
-
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">
-                    Project
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                    Project Name
                   </label>
                   <select
                     name="projectName"
                     value={form.projectName}
                     onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
+                    className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                   >
-                    <option value="">No project</option>
-                    {projects.map((project) => (
-                      <option key={project._id} value={project.name}>
-                        {project.name}
+                    <option value="">General (No project)</option>
+                    {projects.map((p) => (
+                      <option key={p._id} value={p.name}>
+                        {p.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">Status</label>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                    Status
+                  </label>
                   <select
                     name="status"
                     value={form.status}
                     onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
+                    className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                   >
-                    {columns.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
+                    {columns.map((col) => (
+                      <option key={col} value={col}>
+                        {col}
                       </option>
                     ))}
                   </select>
                 </div>
+              </div>
 
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
                     Priority
                   </label>
                   <select
                     name="priority"
                     value={form.priority}
                     onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
+                    className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                   >
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -370,31 +355,47 @@ export default function TasksPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-taskor-ink">Due Date</label>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                    Due Date
+                  </label>
                   <input
                     type="date"
                     name="dueDate"
                     value={form.dueDate}
                     onChange={handleChange}
-                    className="w-full rounded-btn border border-taskor-mist px-4 py-3 outline-none focus:border-taskor-purple"
+                    className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-taskor-slate">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  rows={3}
+                  value={form.description}
+                  onChange={handleChange}
+                  placeholder="Task details and instructions..."
+                  className="w-full rounded-2xl border border-taskor-mist bg-white/70 px-4 py-3 text-sm outline-none focus:border-taskor-purple focus:ring-4 focus:ring-taskor-purple/10 dark:bg-white/10"
+                />
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="inline-flex min-h-11 items-center justify-center rounded-btn border border-taskor-mist px-4 py-3 text-sm font-medium text-taskor-ink"
+                  className="rounded-2xl border border-taskor-mist px-5 py-2.5 text-sm font-semibold text-taskor-ink hover:bg-white/60"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex min-h-11 items-center justify-center rounded-btn bg-taskor-gradient px-5 py-3 text-sm font-semibold text-white"
+                  className="rounded-2xl bg-taskor-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-card disabled:opacity-70"
                 >
-                  {saving ? "Saving..." : editingTask ? "Update Task" : "Create Task"}
+                  {saving ? "Saving..." : editingTask ? "Save Changes" : "Create Task"}
                 </button>
               </div>
             </form>
@@ -404,5 +405,3 @@ export default function TasksPage() {
     </div>
   );
 }
-
-

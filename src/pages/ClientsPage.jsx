@@ -30,9 +30,10 @@ export default function ClientsPage() {
       setLoading(true);
       setError("");
       const data = await getClients();
-      setClients(data);
+      setClients(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err.message || "Failed to load clients");
+      setClients([]);
     } finally {
       setLoading(false);
     }
