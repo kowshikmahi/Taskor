@@ -9,6 +9,7 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
+    "start": "node server/src/server.js",
     "dev": "vite",
     "build": "vite build",
     "build:frontend": "vite build",
