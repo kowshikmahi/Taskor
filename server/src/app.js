@@ -36,21 +36,22 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: false, limit: "1mb" }));
 app.use(sanitizeRequest);
 
-// Rate limiting
-app.use(apiLimiter);
 
 // CORS
 app.use(
   cors({
-    origin(origin, callback) {
-      // Allow requests without an Origin (Postman, curl)
-      if (!origin) return callback(null, true);
+    origin: function (origin, callback) {
+      // Allow requests without Origin (Postman, curl, etc.)
+      if (!origin) {
+        return callback(null, true);
+      }
 
+      // Allow configured frontend origins
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      // Allow local frontend tooling only outside production.
+      // Allow localhost during development
       if (
         !isProduction &&
         (/^http:\/\/localhost:\d+$/.test(origin) ||
@@ -59,11 +60,17 @@ app.use(
         return callback(null, true);
       }
 
+      console.log("Blocked CORS origin:", origin);
       callback(new Error("Not allowed by CORS"));
     },
+
     credentials: true,
   })
 );
+
+// Rate limiting
+app.use(apiLimiter);
+
 
 // Health Routes
 app.get("/", (req, res) => {
