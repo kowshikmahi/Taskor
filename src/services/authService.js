@@ -1,19 +1,19 @@
 import api from "../lib/api";
 
 export const login = ({ email, password }) =>
-  api("/auth/login", {
+  api("/api/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
 
 export const signup = (body) =>
-  api("/auth/signup", {
+  api("/api/auth/signup", {
     method: "POST",
     body: JSON.stringify(body),
   });
 
 export const profile = () =>
-  api("/auth/me");
+  api("/api/auth/me");
 
 // Aliases used by AuthContext
 export const loginUser = login;

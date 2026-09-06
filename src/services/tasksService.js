@@ -1,10 +1,10 @@
 import api from "../lib/api";
 
 export const getTasks = () =>
-  api("/tasks");
+  api("/api/tasks");
 
 export const createTask = (body) =>
-  api("/tasks", {
+  api("/api/tasks", {
     method: "POST",
     body: JSON.stringify(body),
   });
@@ -13,12 +13,12 @@ export const updateTask = (
   id,
   body
 ) =>
-  api(`/tasks/${id}`, {
+  api(`/api/tasks/${id}`, {
     method: "PUT",
     body: JSON.stringify(body),
   });
 
 export const deleteTask = (id) =>
-  api(`/tasks/${id}`, {
+  api(`/api/tasks/${id}`, {
     method: "DELETE",
   });

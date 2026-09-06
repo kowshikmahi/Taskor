@@ -1,10 +1,10 @@
 import api from "../lib/api";
 
 export const getProjects = () =>
-  api("/projects");
+  api("/api/projects");
 
 export const createProject = (body) =>
-  api("/projects", {
+  api("/api/projects", {
     method: "POST",
     body: JSON.stringify(body),
   });
@@ -13,12 +13,12 @@ export const updateProject = (
   id,
   body
 ) =>
-  api(`/projects/${id}`, {
+  api(`/api/projects/${id}`, {
     method: "PUT",
     body: JSON.stringify(body),
   });
 
 export const deleteProject = (id) =>
-  api(`/projects/${id}`, {
+  api(`/api/projects/${id}`, {
     method: "DELETE",
   });
