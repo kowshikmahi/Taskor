@@ -32,44 +32,40 @@ const allowedOrigins = (process.env.CLIENT_URL || "")
 console.log("Allowed CORS origins from env:", allowedOrigins);
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests without an Origin header (Postman, mobile apps, cURL, server-to-server)
+  origin: (origin, callback) => {
+    // Allow requests without Origin (Postman, cURL, server-to-server)
     if (!origin) {
       return callback(null, true);
     }
 
     const normalizedOrigin = origin.toLowerCase().replace(/\/$/, "");
 
-    // 1. Allow explicitly configured frontend URLs
+    // 1. Allow URLs explicitly defined in CLIENT_URL
     if (allowedOrigins.length > 0 && allowedOrigins.includes(normalizedOrigin)) {
-      console.log("CORS allowed explicit origin:", normalizedOrigin);
       return callback(null, true);
     }
 
-    // 2. Allow ALL Vercel preview & production deployments (*.vercel.app)
-    if (normalizedOrigin.endsWith(".vercel.app") || normalizedOrigin.includes("vercel.app")) {
-      console.log("CORS allowed Vercel origin:", normalizedOrigin);
+    // 2. Allow Vercel deployments (*.vercel.app)
+    if (/^https:\/\/.*\.vercel\.app$/.test(normalizedOrigin) || normalizedOrigin.endsWith(".vercel.app")) {
       return callback(null, true);
     }
 
-    // 3. Allow ALL Netlify preview & production deployments (*.netlify.app)
-    if (normalizedOrigin.endsWith(".netlify.app") || normalizedOrigin.includes("netlify.app")) {
-      console.log("CORS allowed Netlify origin:", normalizedOrigin);
+    // 3. Allow Netlify deployments (*.netlify.app)
+    if (/^https:\/\/.*\.netlify\.app$/.test(normalizedOrigin) || normalizedOrigin.endsWith(".netlify.app")) {
       return callback(null, true);
     }
 
     // 4. Allow localhost during development
     if (
+      /^http:\/\/localhost:\d+$/.test(normalizedOrigin) ||
+      /^http:\/\/127\.0\.0\.1:\d+$/.test(normalizedOrigin) ||
       normalizedOrigin.startsWith("http://localhost:") ||
-      normalizedOrigin.startsWith("http://127.0.0.1:") ||
-      normalizedOrigin.startsWith("https://localhost:")
+      normalizedOrigin.startsWith("http://127.0.0.1:")
     ) {
-      console.log("CORS allowed local origin:", normalizedOrigin);
       return callback(null, true);
     }
 
     // 5. Permissive fallback for all cross-origin requests
-    console.log("CORS fallback allowed origin:", normalizedOrigin);
     return callback(null, true);
   },
 
@@ -91,16 +87,20 @@ const corsOptions = {
 };
 
 /* =========================================================
-   SECURITY & MIDDLEWARE
+   SECURITY & MIDDLEWARE ORDERING
+   1. Disable x-powered-by & trust proxy
+   2. Helmet (Security Headers)
+   3. CORS (BEFORE body parsing, rate limiting, and routes)
+   4. OPTIONS Preflight Handling
+   5. Request Logging (Morgan)
+   6. Express Body Parsing
+   7. Sanitization & Rate Limiting
 ========================================================= */
 
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
 
-// Apply CORS globally BEFORE any other middleware
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
+// 2. Helmet
 app.use(
   helmet({
     crossOriginResourcePolicy: {
@@ -109,23 +109,20 @@ app.use(
   })
 );
 
-/* =========================================================
-   LOGGING
-========================================================= */
+// 3. CORS (Global)
+app.use(cors(corsOptions));
 
+// 4. OPTIONS Preflight (Global)
+app.options("*", cors(corsOptions));
+
+// 5. Logging
 app.use(morgan(isProduction ? "combined" : "dev"));
 
-/* =========================================================
-   REQUEST BODY PARSING
-========================================================= */
-
+// 6. Request Body Parsing
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: false, limit: "1mb" }));
 
-/* =========================================================
-   REQUEST SANITIZATION & RATE LIMITING
-========================================================= */
-
+// 7. Sanitization & Rate Limiting (skips OPTIONS preflights)
 app.use(sanitizeRequest);
 app.use(apiLimiter);
 
@@ -147,21 +144,22 @@ app.get("/api/health", (req, res) => {
 
 /* =========================================================
    API ROUTES
+   Mount both /api/* and /* for maximum compatibility
 ========================================================= */
 
-// Authentication (Mount both /api/auth and /auth for frontend compatibility)
+// Authentication
 app.use("/api/auth", authRoutes);
 app.use("/auth", authRoutes);
 
-// Clients (Mount both /api/clients and /clients)
+// Clients
 app.use("/api/clients", clientRoutes);
 app.use("/clients", clientRoutes);
 
-// Projects (Mount both /api/projects and /projects)
+// Projects
 app.use("/api/projects", projectRoutes);
 app.use("/projects", projectRoutes);
 
-// Tasks (Mount both /api/tasks and /tasks)
+// Tasks
 app.use("/api/tasks", taskRoutes);
 app.use("/tasks", taskRoutes);
 

@@ -7,6 +7,7 @@ export const apiLimiter = rateLimit({
   max: isProduction ? 300 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === "OPTIONS",
   message: {
     message: "Too many requests. Please try again later.",
   },
@@ -17,6 +18,7 @@ export const authLimiter = rateLimit({
   max: isProduction ? 10 : 100,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === "OPTIONS",
   message: {
     message: "Too many login attempts. Please try again later.",
   },
