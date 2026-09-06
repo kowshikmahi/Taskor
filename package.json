@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "node server/src/server.js",
+    "postinstall": "cd server && npm install",
     "dev": "vite",
     "build": "vite build",
     "build:frontend": "vite build",
