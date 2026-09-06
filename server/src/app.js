@@ -33,7 +33,7 @@ console.log("Allowed CORS origins from env:", allowedOrigins);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests without an Origin header (Postman, mobile apps, cURL)
+    // Allow requests without an Origin header (Postman, mobile apps, cURL, server-to-server)
     if (!origin) {
       return callback(null, true);
     }
@@ -41,52 +41,53 @@ const corsOptions = {
     const normalizedOrigin = origin.toLowerCase().replace(/\/$/, "");
 
     // 1. Allow explicitly configured frontend URLs
-    if (allowedOrigins.includes(normalizedOrigin)) {
+    if (allowedOrigins.length > 0 && allowedOrigins.includes(normalizedOrigin)) {
       console.log("CORS allowed explicit origin:", normalizedOrigin);
       return callback(null, true);
     }
 
     // 2. Allow ALL Vercel preview & production deployments (*.vercel.app)
-    if (normalizedOrigin.endsWith(".vercel.app")) {
+    if (normalizedOrigin.endsWith(".vercel.app") || normalizedOrigin.includes("vercel.app")) {
       console.log("CORS allowed Vercel origin:", normalizedOrigin);
       return callback(null, true);
     }
 
-    // 3. Allow localhost during development
+    // 3. Allow ALL Netlify preview & production deployments (*.netlify.app)
+    if (normalizedOrigin.endsWith(".netlify.app") || normalizedOrigin.includes("netlify.app")) {
+      console.log("CORS allowed Netlify origin:", normalizedOrigin);
+      return callback(null, true);
+    }
+
+    // 4. Allow localhost during development
     if (
-      !isProduction &&
-      (
-        normalizedOrigin.startsWith("http://localhost:") ||
-        normalizedOrigin.startsWith("http://127.0.0.1:")
-      )
+      normalizedOrigin.startsWith("http://localhost:") ||
+      normalizedOrigin.startsWith("http://127.0.0.1:") ||
+      normalizedOrigin.startsWith("https://localhost:")
     ) {
       console.log("CORS allowed local origin:", normalizedOrigin);
       return callback(null, true);
     }
 
-    // 4. Block everything else
-    console.log("Blocked CORS origin:", normalizedOrigin);
-    return callback(new Error("Not allowed by CORS"));
+    // 5. Permissive fallback for all cross-origin requests
+    console.log("CORS fallback allowed origin:", normalizedOrigin);
+    return callback(null, true);
   },
 
   credentials: true,
 
-  methods: [
-    "GET",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS",
-  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 
   allowedHeaders: [
     "Content-Type",
     "Authorization",
     "X-Requested-With",
+    "Accept",
+    "Origin",
+    "Access-Control-Request-Method",
+    "Access-Control-Request-Headers",
   ],
 
-  optionsSuccessStatus: 204,
+  optionsSuccessStatus: 200,
 };
 
 /* =========================================================
@@ -98,6 +99,7 @@ app.set("trust proxy", 1);
 
 // Apply CORS globally BEFORE any other middleware
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(
   helmet({
@@ -151,14 +153,17 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/auth", authRoutes);
 
-// Clients
+// Clients (Mount both /api/clients and /clients)
 app.use("/api/clients", clientRoutes);
+app.use("/clients", clientRoutes);
 
-// Projects
+// Projects (Mount both /api/projects and /projects)
 app.use("/api/projects", projectRoutes);
+app.use("/projects", projectRoutes);
 
-// Tasks
+// Tasks (Mount both /api/tasks and /tasks)
 app.use("/api/tasks", taskRoutes);
+app.use("/tasks", taskRoutes);
 
 /* =========================================================
    ERROR HANDLING
